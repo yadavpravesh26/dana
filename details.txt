@@ -1,0 +1,20 @@
+Dana Dev Credentials
+Username --> root
+Password --> jfMnlp1>Voix5i
+DB Name -->  eorchi_dana_dev
+
+http://host.e-orchids.co.in:2087/
+root
+jfMnlp1>Voix5i
+
+
+https://e-orchids.com/dana_dev/login.php
+admin@danaworld.com
+admin@123
+
+
+total_project
+filter_state
+filter_city
+filter_key
+
