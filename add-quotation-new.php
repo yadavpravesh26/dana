@@ -57,7 +57,7 @@ if(isset($_POST['btnSubmit']))
 						'pUnit'	=>$_POST['pUnit'][$i],
 						'pQTY'	=>$_POST['pQTY'][$i],
 						'pUnitPrice'	=>$_POST['pUnitPrice'][$i],
-						'pTax'	=>0,
+						//'pTax'	=>$_POST['pTax'][$i],
 						'pTotal'	=>$_POST['pTotal'][$i],
 						'quotation_id'	=>$last_quot_id
 					);
@@ -101,7 +101,7 @@ if(isset($_POST['btnSubmit']))
 					'pUnit'	=>$_POST['pUnit'][$i],
 					'pQTY'	=>$_POST['pQTY'][$i],
 					'pUnitPrice'	=>$_POST['pUnitPrice'][$i],
-					'pTax'	=>0,
+					//'pTax'	=>$_POST['pTax'][$i],
 					'pTotal'	=>$_POST['pTotal'][$i],
 					'quotation_id'	=>$_REQUEST['id']
 				);
@@ -109,8 +109,6 @@ if(isset($_POST['btnSubmit']))
 				$result = $prop->update('quot_trading', $product_details, array("id" => $_POST['ID'][$i]));
 				else
 				$result = $prop->add('quot_trading', $product_details);
-				
-				echo $result."<br>";
 			}
 			setcookie('status', 'Success', time()+10);
 			setcookie('title', 'Quotation Updated Successfully', time()+10);
@@ -260,54 +258,20 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
                         <div class="col-sm-3">
                            <div class="form-group">
                               <label>Quotation Number</label>
-                              <?php if($curr_val['estNumber'] != ''){ $estNumber = $curr_val['estNumber'];}else {
-								  if(!isset($_SESSION['autoQuotNumber'])){
-								   $sqlID='SELECT id from quotations ORDER BY id DESC LIMIT 1';							   
-								   $rowID=$prop->getAll_Disp($sqlID);
-								   $estNumber = 331456 + $rowID[0]["id"];
-								   $_SESSION['autoQuotNumber'] = $estNumber;
-								   }
-								   else
-								   {
-								   	 $estNumber = $_SESSION['autoQuotNumber'] + 1;
-									 $_SESSION['autoQuotNumber'] = $estNumber;
-								   }
-							   }?>
-                              <input type="text" class="form-control" placeholder="Quotation Number" name="estNumber" value="<?php echo $estNumber;?>" readonly>
+                              <input type="text" class="form-control" placeholder="Quotation Number" name="estNumber" value="<?php if($curr_val['estNumber'] != ''){ echo $curr_val['estNumber'];}else {echo 331456;}?>" readonly>
                            </div>
                         </div>
                         <div class="col-sm-3">
                            <div class="form-group">
                               <label>Quotation Created Date</label>
-                              <input type="text" class="form-control mydatepicker" placeholder="Quotation Created Date" value="<?php echo date("m/d/Y", strtotime($curr_val['estCreatedDate']));?>" name="estCreatedDate" required>
+                              <input type="text" class="form-control" placeholder="Quotation Created Date" value="<?php echo date("m/d/Y", strtotime($curr_val['estCreatedDate']));?>" name="estCreatedDate" required>
                            </div>
                         </div>
                         <div class="col-sm-3">
                            <div class="form-group">
                               <label>Quotation Created By</label>
                               <select class="form-control select2" name="estCreatedBy" required>
-                              <option value="">Select User</option>
-                              <?php if($_SESSION['group_id']==1){
-							  	$all_users = $prop->getAll_Disp('select * from '.USERS.' WHERE is_delete = 0');
-                                foreach($all_users as $rowUser)
-                                {
-									$id = $rowUser['id'];
-									$name =$rowUser['f_name'];
-									$sel='';
-									if($id == $curr_val['estCreatedBy'])
-									$sel='selected="selected"';
-									echo '<option value="'.$id.'" '.$sel.'>'.$name.'</option>';
-								}
-							  }
-							  else
-							  {
-							  	$user = $prop->get_Disp('select * from '.USERS.' WHERE is_delete = 0 AND id='.$User_Id);
-								$f_name = $user['f_name'];
-							  	echo '<option value="'.$User_Id.'">'.f_name.'</option>';
-							  }
-							  ?>
-                              
-                                 
+                                 <option value="AK">New Project</option>
                               </select>
                            </div>
                         </div>
@@ -322,18 +286,7 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
                         <div class="col-sm-3">
                            <label>Choose Client Name</label>
                            <select class="form-control select2" name="clientName" required>
-                           <option value="">Select Client</option>
-                           <?php
-                            $sql_client = 'select * from '.CLIENTS.' where status != 2';
-						    $row_client=$prop->getAll_Disp($sql_client);
-							for($IC=0; $i<count($row_client); $i++)
-							{
-								$sel='';
-								if($row_client[$IC]["id"] == $curr_val['clientName'])
-								$sel='selected="selected"';
-								echo '<option value="'.$row_client[$IC]["id"].'" '.$sel.'>'.$row_client[$IC]["c_name"].'</option>';
-							} 
-						   ?>
+                              <option value="AK">Bharath Resturant</option>
                            </select>
                         </div>
                         <div class="col-sm-3">
@@ -453,13 +406,13 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
                      <div class="row cls-btm m-t-20">
                         <div class="col-sm-2">
                            <label>Status</label>
-                           <select class="form-control select2" name="Status">
+                           <select class="form-control select2">
                               <option value="HI">Prepared By</option>
                               <option value="AK">Approved By</option>
                            </select>
                         </div>
                         <div class="col-sm-2 text-right m-t-20" style="margin-left: -40px;">
-                           <button type="submit" class="btn btn-success waves-effect waves-light m-r-10" name="btnSubmit"><?php if(isset($_REQUEST['id'])){echo "Update";} else{echo "Save";}?></button>
+                           <button type="submit" class="btn btn-success waves-effect waves-light m-r-10"><?php if(isset($_REQUEST['id'])){echo "Update";} else{echo "Save";}?></button>
                            <button type="submit" class="btn btn-inverse waves-effect waves-light">Cancel</button>
                            <!--<button type="button" class="add-new btn btn-info" id="add-new">Add New Income</button>-->
                         </div>
@@ -470,7 +423,6 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
                               <h3>Prepared By</h3>
                               <input type="hidden" name="PreparedById" value="0">
                               <div><label class="lab-ttl">Co-Ordinator	</label>: <label class="lab-nam">Mohammed</label>
-
                               </div>
                               <div> <label class="lab-ttl">Approved Date & Time	</label>: <label class="lab-nam">12/12/2019 05:30 PM</label></div>
                               <div><label class="lab-ttl">IP Address	</label>: <label class="lab-nam">101.198.10.10</label></div>
@@ -541,16 +493,8 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
       <script>
          // For select 2
          $(".select2").select2();
-		 <?php 
-		 if(isset($_REQUEST['id']))
-		 {?>
-		 	$('.mydatepicker, #datepicker').datepicker();
-		 <?php }
-		 else
-		 {
-		 ?>
-		$('.mydatepicker, #datepicker').datepicker('setDate', 'currentdate');
-  		<?php }?>
+		jQuery('.mydatepicker, #datepicker').datepicker('setDate', 'currentdate');
+  
       </script>
        <!-- Table 1 start -->
       <script type="text/javascript">//<![CDATA[
@@ -574,67 +518,7 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
          sno,
          optionVal,
          price
-         }) => `<tr>
-           <td>
-		   	 <input type="hidden" class="form-control" name="pID[]" id="pID${i}" />
-             <select id="productID${i}" class="form-control select2 select2_${i} " data-id="pID${i}" onchange="addVal(this)" selected="${optionVal}" required>
-               <option value="0"> -- Select One --</option>
-                <?php 
-			    $wh_sel = $prop->getAll_Disp('SELECT A.*,GROUP_CONCAT(B.name ORDER BY B.id) as name FROM '.INVENTORY_TABLE.' as A INNER JOIN '.VENDOR_TABLE.' AS B ON FIND_IN_SET(B.id, A.vendor) > 0 WHERE A.is_delete = 0 GROUP BY A.id');
-
-				foreach($wh_sel as $rowP)
-				{
-				   $id = $rowP['id'];
-				   $name =$rowP['p_id'];
-				   $sel = '';
-				   if($row[$i]["pID"] == $id)
-				   $sel = 'selected=selected';
-				   
-				   echo "<option value=".$id." ".$sel.">".$name."</option>";
-			   }
-			   ?>
-             </select>
-           </td>
-           <td>
-		     <input type="hidden" class="form-control" name="pName[]" id="pName${i}" />
-             <select id="productName${i}"  class="form-control select2 select2_${i}" data-id="pName${i}" onchange="addVal(this)" selected="${optionVal}" required>
-               <option value="0"> -- Select One --</option>
-                <?php 
-			    $wh_sel = $prop->getAll_Disp('SELECT A.*,GROUP_CONCAT(B.name ORDER BY B.id) as name FROM '.INVENTORY_TABLE.' as A INNER JOIN '.VENDOR_TABLE.' AS B ON FIND_IN_SET(B.id, A.vendor) > 0 WHERE A.is_delete = 0 GROUP BY A.id');
-
-				foreach($wh_sel as $rowP)
-				{
-				   $id = $rowP['id'];
-				   $name =$rowP['p_name'];
-				   $sel = '';
-				   if($row[$i]["pID"] == $id)
-				   $sel = 'selected=selected';
-				   
-				   echo "<option value=".$id." ".$sel.">".$name."</option>";
-			   }
-			   ?>
-             </select>
-           </td>
-           <td>
-             <input type="text" class="form-control" name="pDescription[]" id="pDescription${i}" />
-                   </td>
-           <td>
-             <input  type="number" class="form-control" name="pUnit[]" id="pUnit${i}" required />
-           </td>
-           <td>
-             <input  type="number" class="form-control" name="pQTY[]" id="pQTY${i}" required  />
-           </td>
-           <td>
-             <input type="number" class="form-control" name="pUnitPrice[]" id="pUnitPrice${i}" required />
-           </td>
-           <td>
-             <input id="pTotal${i}" pattern="[0-9]" type="number" name="pTotal[]" class="form-control text-right"  required />
-           </td>
-           <td>
-             <!-- glyphicon-plus | glyphicon-remove -->
-             <button type="button" class="remove-row btn btn-info icon-close"></button>
-           </td>
-         </tr> `;
+         }) => `<tr><td><input type="hidden" class="form-control" name="pID[]" id="pID${i}" value="0" /><select id="productID${i}" data-id="pID${i}" onchange="addVal(this)" class="form-control select2 select2_${i}" selected="${optionVal}" required><option value="0"> -- Select One --</option><option value="1"> IPhone </option><option value="2"> MAC </option><option value="3"> Windows </option></select></td><td><input type="hidden" class="form-control" name="pName[]" id="pName${i}" value="0"/><select id="productName${i}" data-id="pName${i}" onchange="addVal(this)" class="form-control select2 select2_${i}" selected="${optionVal}" required><option value="0"> -- Select One --</option><option value="1"> IPhone </option><option value="2"> MAC </option><option value="3"> Windows </option></select></td>  <td><input type="text" class="form-control" name="pDescription[]" title="" ></td><td><input type="number" name="pUnit[]" class="form-control" title="" required></td><td><input type="number" name="pQTY[]" class="form-control"  title="" required></td><td><input type="number" name="pUnitPrice[]" class="form-control" title="" required></td><td><input type="number" name="pTotal[]" class="form-control text-right" value="${price}" title="" required></td>  <td><button type="button" class="remove-row btn btn-info icon-close" ></button></td>  </tr>`;
          // onclick=\'removeRow(this)\'
 
          //window.onload=function(){}
@@ -669,17 +553,17 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
          });
 
          $('table#productTable').on('input propertychange',' > tbody > tr > td:nth-child(4) > input', function() {
-         $.each($('table#productTable > tbody > tr > td:nth-child(4) > input[type=text]'), function() {
+         $.each($('input[type=text]'), function() {
          this.value = this.value.replace(/[^0-9]/g, '');
          });
          });
          $('table#productTable').on('input propertychange',' > tbody > tr > td:nth-child(5) > input', function() {
-         $.each($('table#productTable > tbody > tr > td:nth-child(5) > input[type=text]'), function() {
+         $.each($('input[type=text]'), function() {
          this.value = this.value.replace(/[^0-9]/g, '');
          });
          });
          $('table#productTable').on('input propertychange',' > tbody > tr > td:nth-child(6) > input', function() {
-         $.each($('table#productTable > tbody > tr > td:nth-child(6) > input[type=text]'), function() {
+         $.each($('input[type=text]'), function() {
          this.value = this.value.replace(/[^0-9]/g, '');
          });
          });
@@ -733,10 +617,11 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
 
 
          var totalamount = 0; // tr#mainRow
-         $('table#productTable > tbody ').on('keyup', 'input', function(e) {		    
+        
+		 $('table#productTable > tbody ').on('keyup', 'input', function(e) {
          var total =
          $(e.delegateTarget)
-         .find('input[name="pTotal[]"]')
+         .find('input[type=number]')
          .map(function() {
            return parseFloat($(this).val()) || 0;
          })
@@ -744,22 +629,7 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
          .reduce(function(a, b) {
            return a + b;
          });
-		 
-		 /**/
-		 $('table#productTable > tbody ').on('keyup', 'input[name="pQTY[]"]', function(e) {
-		 
-		    var pQTY = $(this).val();
-			var pQTY_id = $(this).attr('id');
-			selected_id = pQTY_id.replace ( /[^\d.]/g, '' );
-			var pUnitPrice = $("#pUnitPrice"+selected_id).val();
-			$("#pTotal"+selected_id).val( pQTY * pUnitPrice );
-			$("#pTotal"+selected_id).prop('readonly', true);			
-			$('input[name="pQTY[]"]').keyup();
-			
-         })
-		 /**/
-		    
-		 
+
          $('#total').text(total);
          $('#total_add').text(total);
          $('#tax_add').text(total);
@@ -775,30 +645,54 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
 			var id = element.attr("data-id");
 			var status = 2;
 			var ms = 'Delete'
-			if(id == 0)
-			{
-				element.closest('tr').remove();
-				$('input[name="pQTY[]"]').keyup();	
-			}
-			else
-			{
-				$.ajax({
-					type: "POST",
-					url: "ajax-status.php",
-					cache:false,
-					data: 'id='+id+'&meth=quot-row-del',
-					dataType:'json',
-					success: function(response)
+			swal({
+				title: ms,
+				text: "Are you sure?",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "Yes, Delete it!",
+				cancelButtonText: "Cancel",
+				closeOnConfirm: false,
+				closeOnCancel: false
+			}, function(isConfirm){
+				if (isConfirm) {
+					if(id == 0)
 					{
+						$('input[name="pTotal[]"]').keyup();
 						element.closest('tr').remove();
-						$('input[name="pQTY[]"]').keyup();
-						swal(response.status, response.msg,response.err);
-						if(response.result){
-							$('#myTable').DataTable().ajax.reload();
-						}
 					}
-				});
-			}	
+					else
+					{
+						$.ajax({
+							type: "POST",
+							url: "ajax-status.php",
+							cache:false,
+							data: 'id='+id+'&meth=quot-row-del',
+							dataType:'json',
+							success: function(response)
+							{
+								$('input[name="pTotal[]"]').keyup();
+								element.closest('tr').remove();
+								swal(response.status, response.msg,response.err);
+								if(response.result){
+									$('#myTable').DataTable().ajax.reload();
+								}
+								setTimeout(function() {
+									$(".confirm").trigger('click');
+								}, 3000);
+							}
+						});
+					}	
+				}
+				else
+				{
+					swal("Cancelled", "", "error");
+					setTimeout(function() {
+						$(".confirm").trigger('click');
+					}, 3000);
+				}
+			});
          //$("#productTable").each(function () {
          // added total minus deleting element price.
          //$(this).closest('tr').remove(); // https://stackoverflow.com/a/11553788/5081877
@@ -826,44 +720,10 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
 
          setTimeout(function() {
              $('.select2_0').select2();
-         }, 1000);
+                             }, 1000);
 		setTimeout(function() {
              $('input[name="pTotal[]"]').keyup();
-		}, 1000);
-		
-		function addVal(that)
-		{
-		 var change_input = $(that).attr('data-id');
-		 if(change_input != '')
-		 $('#'+change_input).val(that.value);
-		 var pID = that.value;
-		 selected_id = change_input.replace ( /[^\d.]/g, '' );
-		 $("#productID"+selected_id+" option[value='"+that.value+"']").prop('selected', true);
-		 $("#productName"+selected_id+" option[value='"+that.value+"']").prop('selected', true);
-		 $.ajax({
-					type: "POST",
-					url: "ajax-status.php",
-					cache:false,
-					data: 'id='+pID+'&meth=get_product_details',
-					dataType:'json',
-					success: function(response)
-					{
-						console.log(response.unitval+"===="+selected_id);
-						if(response.result){
-							$("#productID"+selected_id).select2();	
-							$("#productName"+selected_id).select2();
-							$("#pDescription"+selected_id).val(response.p_des);
-							$("#pUnit"+selected_id).val(response.unitval);
-							$("#pUnitPrice"+selected_id).val(response.s_price);
-							$("#pUnit"+selected_id).prop('readonly', true);
-							$("#pUnitPrice"+selected_id).prop('readonly', true); 							
-						}
-						
-					}			
-			});
-
-		}
-					 
+		}, 1000);					 
          //]]>
       </script>
       <script id="hidden-template" type="text/x-custom-template">
@@ -878,56 +738,34 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
 		   	 <input type="hidden" class="form-control" name="pID[]" id="pID<?php echo $i; ?>" value="<?php echo $row[$i]["pID"]; ?>" />
              <select id="productID0" class="form-control select2 select2_<?php echo $i; ?> " data-id="pID<?php echo $i; ?>" onchange="addVal(this)" selected="${optionVal}" required>
                <option value="0" <?php if($row[$i]["pID"] == 0){echo 'selected';} ?>> -- Select One --</option>
-			   <?php 
-			    $wh_sel = $prop->getAll_Disp('SELECT A.*,GROUP_CONCAT(B.name ORDER BY B.id) as name FROM '.INVENTORY_TABLE.' as A INNER JOIN '.VENDOR_TABLE.' AS B ON FIND_IN_SET(B.id, A.vendor) > 0 WHERE A.is_delete = 0 GROUP BY A.id');
-
-				foreach($wh_sel as $rowP)
-				{
-				   $id = $rowP['id'];
-				   $name =$rowP['p_id'];
-				   $sel = '';
-				   if($row[$i]["pID"] == $id)
-				   $sel = 'selected=selected';
-				   
-				   echo "<option value=".$id." ".$sel.">".$name."</option>";
-			   }
-			   ?>
+               <option value="1" <?php if($row[$i]["pID"] == 1){echo 'selected';} ?>> IPhone </option>
+               <option value="2" <?php if($row[$i]["pID"] == 2){echo 'selected';} ?>> MAC </option>
+               <option value="3" <?php if($row[$i]["pID"] == 3){echo 'selected';} ?>> Windows </option>
              </select>
            </td>
            <td>
 		     <input type="hidden" class="form-control" name="pName[]" id="pName<?php echo $i; ?>" value="<?php echo $row[$i]["pName"]; ?>" />
              <select id="productName<?php echo $i; ?>"  class="form-control select2 select2_<?php echo $i; ?>" data-id="pName0" onchange="addVal(this)" selected="${optionVal}" required>
                <option value="0" <?php if($row[$i]["pName"] == 0){echo 'selected';} ?>> -- Select One --</option>
-               <?php 
-			    $wh_sel = $prop->getAll_Disp('SELECT A.*,GROUP_CONCAT(B.name ORDER BY B.id) as name FROM '.INVENTORY_TABLE.' as A INNER JOIN '.VENDOR_TABLE.' AS B ON FIND_IN_SET(B.id, A.vendor) > 0 WHERE A.is_delete = 0 GROUP BY A.id');
-
-				foreach($wh_sel as $rowP)
-				{
-				   $id = $rowP['id'];
-				   $name =$rowP['p_name'];
-				   $sel = '';
-				   if($row[$i]["pID"] == $id)
-				   $sel = 'selected=selected';
-				   
-				   echo "<option value=".$id." ".$sel.">".$name."</option>";
-			   }
-			   ?>
+               <option value="1" <?php if($row[$i]["pName"] == 1){echo 'selected';} ?>> IPhone </option>
+               <option value="2" <?php if($row[$i]["pName"] == 2){echo 'selected';} ?>> MAC </option>
+               <option value="3" <?php if($row[$i]["pName"] == 3){echo 'selected';} ?>> Windows </option>
              </select>
            </td>
            <td>
-             <input type="text" class="form-control" name="pDescription[]" value="<?php echo $row[$i]["pDescription"]; ?>" id="pDescription<?php echo $i; ?>" />
+             <input type="text" class="form-control" name="pDescription[]" value="<?php echo $row[$i]["pDescription"]; ?>" />
                    </td>
            <td>
-             <input  type="number" class="form-control" name="pUnit[]" value="<?php echo $row[$i]["pUnit"]; ?>" id="pUnit<?php echo $i; ?>" required />
-           </td>
-		   <td>
-             <input type="number" class="form-control" name="pQTY[]" value="<?php echo $row[$i]["pQTY"]; ?>" id="pQTY<?php echo $i; ?>" required />
+             <input  type="number" class="form-control" name="pUnit[]" value="<?php echo $row[$i]["pUnit"]; ?>" required />
            </td>
            <td>
-             <input type="number" class="form-control" name="pUnitPrice[]" value="<?php echo $row[$i]["pUnitPrice"]; ?>" id="pUnitPrice<?php echo $i; ?>" required />
+             <input type="number" class="form-control" name="pUnitPrice[]" value="<?php echo $row[$i]["pUnitPrice"]; ?>" required />
            </td>
            <td>
-             <input pattern="[0-9]" type="number" name="pTotal[]" class="form-control text-right" value="<?php echo $row[$i]["pTotal"]; ?>" id="pTotal<?php echo $i; ?>" required />
+             <input type="number" class="form-control" name="pTax[]" value="<?php echo $row[$i]["pTax"]; ?>" required />
+           </td>
+           <td>
+             <input id="number_only" pattern="[0-9]" type="number" name="pTotal[]" class="form-control text-right" value="<?php echo $row[$i]["pTotal"]; ?>" required />
            </td>
            <td>
              <!-- glyphicon-plus | glyphicon-remove -->
@@ -945,56 +783,34 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
 		   	 <input type="hidden" class="form-control" name="pID[]" id="pID0" />
              <select id="productID0" class="form-control select2 select2_0 " data-id="pID0" onchange="addVal(this)" selected="${optionVal}" required>
                <option value="0"> -- Select One --</option>
-                <?php 
-			    $wh_sel = $prop->getAll_Disp('SELECT A.*,GROUP_CONCAT(B.name ORDER BY B.id) as name FROM '.INVENTORY_TABLE.' as A INNER JOIN '.VENDOR_TABLE.' AS B ON FIND_IN_SET(B.id, A.vendor) > 0 WHERE A.is_delete = 0 GROUP BY A.id');
-
-				foreach($wh_sel as $rowP)
-				{
-				   $id = $rowP['id'];
-				   $name =$rowP['p_id'];
-				   $sel = '';
-				   if($row[$i]["pID"] == $id)
-				   $sel = 'selected=selected';
-				   
-				   echo "<option value=".$id." ".$sel.">".$name."</option>";
-			   }
-			   ?>
+               <option value="1"> IPhone </option>
+               <option value="2"> MAC </option>
+               <option value="3"> Windows </option>
              </select>
            </td>
            <td>
 		     <input type="hidden" class="form-control" name="pName[]" id="pName0" />
              <select id="productName0"  class="form-control select2 select2_0" data-id="pName0" onchange="addVal(this)" selected="${optionVal}" required>
                <option value="0"> -- Select One --</option>
-                <?php 
-			    $wh_sel = $prop->getAll_Disp('SELECT A.*,GROUP_CONCAT(B.name ORDER BY B.id) as name FROM '.INVENTORY_TABLE.' as A INNER JOIN '.VENDOR_TABLE.' AS B ON FIND_IN_SET(B.id, A.vendor) > 0 WHERE A.is_delete = 0 GROUP BY A.id');
-
-				foreach($wh_sel as $rowP)
-				{
-				   $id = $rowP['id'];
-				   $name =$rowP['p_name'];
-				   $sel = '';
-				   if($row[$i]["pID"] == $id)
-				   $sel = 'selected=selected';
-				   
-				   echo "<option value=".$id." ".$sel.">".$name."</option>";
-			   }
-			   ?>
+               <option value="1"> IPhone </option>
+               <option value="2"> MAC </option>
+               <option value="3"> Windows </option>
              </select>
            </td>
            <td>
-             <input type="text" class="form-control" name="pDescription[]" id="pDescription0" />
+             <input type="text" class="form-control" name="pDescription[]" />
                    </td>
            <td>
-             <input  type="number" class="form-control" name="pUnit[]" id="pUnit0" required />
+             <input  type="number" class="form-control" name="pUnit[]" required />
            </td>
            <td>
-             <input  type="number" class="form-control" name="pQTY[]" id="pQTY0" required  />
+             <input  type="number" class="form-control" name="pQTY[]"required  />
            </td>
            <td>
-             <input type="number" class="form-control" name="pUnitPrice[]" id="pUnitPrice0" required />
+             <input type="number" class="form-control" name="pUnitPrice[]" required />
            </td>
            <td>
-             <input pattern="[0-9]" type="number" name="pTotal[]" class="form-control text-right" id="pTotal0" required />
+             <input id="number_only" pattern="[0-9]" type="number" name="pTotal[]" class="form-control text-right" required />
            </td>
            <td>
              <!-- glyphicon-plus | glyphicon-remove -->
@@ -1014,9 +830,9 @@ if(isset($_REQUEST['id']) && $_REQUEST['id']!=''){
 		 {
 		 	$ival = $prop->get('count(*) as ival','quot_trading', array('quotation_id'=>$_REQUEST['id']));
 			echo 'var i='.($ival["ival"]-1).';';
-		 }
-		 else
-		 echo 'var i=1;';	
+		}
+		else
+		echo 'var i=1;';	
 		 ?>
          const dynamic_JS1 = ({
          sno1,

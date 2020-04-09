@@ -84,37 +84,62 @@ if(empty($User_Id)){
                         <div class="col-sm-3">
                            <div class="form-group">
                               <label>Quotation Number</label>
-                              <input type="text" class="form-control" placeholder="Quotation NO">
+                              <input type="text" class="form-control" placeholder="Quotation NO" id="QuotNumber" onKeyUp="filter_data()">
                            </div>
                         </div>
                         <div class="col-sm-3">
                            <label>Created By</label>
-                           <select class="form-control select2">
-                              <option value="AK">Mark</option>
-                              <option value="HI">Mohammed</option>
-                              <option value="HI">Abhi</option>
+                           <select class="form-control select2" id="QuotCreatedBy" onChange="filter_data()">
+                              <option value="">Select User</option>
+                              <?php if($_SESSION['group_id']==1){
+							  	$all_users = $prop->getAll_Disp('select * from '.USERS.' WHERE is_delete = 0');
+                                foreach($all_users as $rowUser)
+                                {
+									$id = $rowUser['id'];
+									$name =$rowUser['f_name'];
+									$sel='';
+									if($id == $curr_val['estCreatedBy'])
+									$sel='selected="selected"';
+									echo '<option value="'.$id.'" '.$sel.'>'.$name.'</option>';
+								}
+							  }
+							  else
+							  {
+							  	$user = $prop->get_Disp('select * from '.USERS.' WHERE is_delete = 0 AND id='.$User_Id);
+								$f_name = $user['f_name'];
+							  	echo '<option value="'.$User_Id.'">'.f_name.'</option>';
+							  }
+							  ?>
                            </select>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-3" id="QuotClient">
                            <label>Client</label>
-                           <select class="form-control select2">
-                              <option value="AK">Fine Traders</option>
-                              <option value="HI">Good Work</option>
-                              <option value="HI">Triumph</option>
+                           <select class="form-control select2" onChange="filter_data()">
+                           <option value="">Select Client</option>
+                           <?php
+                            $sql_client = 'select * from '.CLIENTS.' where status != 2';
+						    $row_client=$prop->getAll_Disp($sql_client);
+							for($IC=0; $i<count($row_client); $i++)
+							{
+								echo '<option value="'.$row_client[$IC]["id"].'">'.$row_client[$IC]["c_name"].'</option>';
+							} 
+						   ?>
                            </select>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-3" id="QuotProjects">
                            <label>Projects</label>
-                           <select class="form-control select2">
+                           <select class="form-control select2" onChange="filter_data()">
+                              <option value="">Select Project</option>
                               <option value="AK">Fine Traders</option>
                               <option value="HI">Good Work</option>
                               <option value="HI">Triumph</option>
                            </select>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-3" id="QuotType">
                            <label>Type of Quotation</label>
-                           <select class="form-control select2">
-                              <option value="AK">Trading Quotation</option>
+                           <select class="form-control select2" onChange="filter_data()">
+                              <option value="">Select Type</option>
+                              <option value="TradingQuotation">Trading Quotation</option>
                               <option value="HI">AMC Quotation</option>
                               <option value="HI">RetroFit Quotation</option>
                            </select>
@@ -123,7 +148,7 @@ if(empty($User_Id)){
                            <div class="form-group">
                               <label>Date</label>
                               <div class="input-group">
-                                 <input type="text" class="form-control mydatepicker" placeholder="mm/dd/yyyy">
+                                 <input type="text" class="form-control mydatepicker" placeholder="mm/dd/yyyy" id="QuotDate" onKeyUp="filter_data()">
                                  <div class="input-group-append">
                                     <span class="input-group-text"><i class="icon-calender"></i></span>
                                  </div>
@@ -163,372 +188,10 @@ if(empty($User_Id)){
       <?php include("footer.php"); ?>
       <!--print section -->
       <div class="print-container clearfix" style="display:none"  id='printMe'>
-      <div class="header">
-      <div class="sub-header">
-
-         <div class="content">
-            <!-- <table style="width:100%" border='1'>
-               <tr style="width:100%" class="heading">
-                 <td colspan="3" >
-                             <img class="invoice-logo" src="plugins/images/dana-world-logo.png" alt="" />
-                 </td>
-                 <td class="text-right" style='line-height:23px'>
-                   Dana World Cont. Co WLL</br>
-                   Po Box: 32532</br>
-                  Tel: +974 4431 3911 |Fax: +974 4437 5398
-                       </P>
-                   </div>
-               
-                 </td>
-               </tr>
-                 <tr class="sub-heading">
-                   <td colspan="3">
-                       <div class="billto">
-                         <strong><big>ALMOAYYED AIR CONDITIONING</strong></big> <br />
-                         Mob: +974 33409669 / 4432221-121<br />
-                         Email:rajesh@almoayyedac.com.qa,aacpurchaser@gmail.com<br />
-                         Doha,Qatar.
-               
-                       </div>
-                   </td>
-                   <td class="">
-                       <div class="invoice-details">
-                         <strong>Quotation Number : </strong> IN_123456_MMDDYY <br />
-                         <strong>Quotation Duration : </strong> 29 Aug 2019 - 29 Sep 2019 <br />
-                         <strong>Quotation Date: </strong> 23 Sep 2019 <br />
-                         <strong>Quotation Amount : </strong> $ 12,000 <br />
-                       </div>
-                   </td>
-               </tr>
-               </table> -->
-            <table style='width:100%' >
-               <tr>
-                  <td class='text-left' style='max-width:240px;' >
-                     <img class="invoice-logo" src="./Images/logo1.png" style='height:50%;width:60%;padding-top:5px' alt="" />
-                  </td>
-                  <td class='text-right' colspan='4' style='line-height:24px'>
-                     Dana World Cont.Co WILL</br>
-                     Po Box: 32532</br>
-                     Tel: +974 4431 3911 | Fax: +974 4437 5398
-                  </td>
-               </tr>
-               <tr style='width:100%:padding:0'>
-                  <td class='text-center' valign='bottom'  colspan='2'>
-                     <h5 style='text-decoration:underline;text-underline-position: under;font-weight:900;color:black;padding-top:15px'>QUOTATION</h5>
-                  </td>
-               </tr>
-            </table>
-            <table style='width:100%;margin:15px 0px'>
-               <tr style='width:100%'>
-                  <td class='text-left' style='width:150px;height:10px;padding-bottom:-10px'>
-                     <p style='display:inline'>
-                     <p style='display:inline'><strong>Date</strong></p>
-                     31-Oct-2019</p>
-                     <!-- </td><td style='width:30px'></td> -->
-                  <td class='text-center' style='width:150px;height:10px;padding-bottom:-10px' >
-                     <p style='display:inline'>
-                     <p style='display:inline'><strong>Quote Ref:</strong></p>
-                     DWCC/T/QTN/108</p>
-                  </td>
-                  <td style='width:50px'></td>
-                  <td class='text-left' style='width:150px;height:10px;padding-bottom:-10px'>
-                     <p style='display:inline'>
-                     <p style='display:inline'><strong>Project Ref:</strong></p>
-                     ALMOAYYED</p>
-                     <!-- </td><td style='width:110px'></td> -->
-                     <!-- <td align='left' style='height:10px;padding-bottom:-10px'>
-                        <p style='display:inline'><p style='display:inline'><strong>Job Ref:</strong></p> MNT</p>
-                        </td> -->
-               </tr>
-            </table>
-            <table style='width:100%'>
-               <tr style='border-bottom:1px solid black'>
-                  <td><strong>To</strong></td>
-               </tr>
-               <tr>
-                  <td style='padding-top:10px'>
-                     ALMOAYYED AIR CONDITIONING<br>
-                     Mob: +974 33409669 / 4432221 - 121<br>
-                     E-mail: rajesh@almoayyedac.com.qa , aacpurchaser<br>
-                     Doha, Qatar
-                  </td>
-               </tr>
-               <tr>
-                  <td style='padding-top:15px;line-height:23px'>
-                     <strong>Kind Attn: Mr.Rajesh</strong><br>
-                     <strong>Subject: SUPPLY FIRE EXTINGUISHERS & FA DEVICES</strong><br>
-                     <strong>Project: AL ALMOAYYED AIR CONTIONING</strong>
-                  </td>
-               </tr>
-               <tr>
-                  <td style='padding-top:15px;line-height:23px'>
-                     Dear Sir,
-                     <p style='text-indent:30px;text-align:justify'>With reference to your above project enquiry, please find enclosed herewith our commercial offer as per the Annexure-A. Our offer is based on your Enquiry. Any additional equipment required other than indicated in our commercial BOQ will subject to our offer to be revised accordingly </p>
-                     <p style='text-indent:30px;text-align:justify'>We hope our offer meets with your current requirements, if you require further information / clarifications please do not hesitate to contact undersigned</p>
-               </tr>
-               <tr style='text-align:center'>
-                  <td style=''>
-                     <h5 style='text-decoration:underline;text-underline-position:under'>Annexure - A</h5>
-                  </td>
-               </tr>
-            </table>
-         </div>
+     
       </div>
-      <div class="body">
-      <div class="summary-info">
-         <table id="myTable" style='border:1px solid black;width:100%' >
-            <!-- <thead>
-               <tr>
-                 <th>PID	</th>
-                 <th>Product Name</th>
-                 <th>Product Description</th>
-                 <th>Unit</th>
-                 <th>QTY</th>
-                 <th  colspan='2'>Unit Price (QR)</th>
-                 <th>Tax %</th>
-                 <th  colspan='2'>Total (QR)</th>
-               </tr>
-               </thead>
-               <tbody>
-               <tr>
-                 <td>323</td>
-                 <td>White Cement</td>
-                 <td>Wet cement</td>
-                 <td>Kg</td>
-                 <td>300</td>
-                 <td colspan='2'>110</td>
-                 <td>5</td>
-                 <td colspan='2'>2000</td>
-               
-               </tr>
-               <tr>
-                 <td>323</td>
-                 <td>White Cement</td>
-                 <td>Wet cement</td>
-                 <td>Kg</td>
-                 <td>300</td>
-                 <td colspan='2'>110</td>
-                 <td>5</td>
-                 <td colspan='2'>2000</td>
-               
-               </tr>
-               <tr>
-                 <td>323</td>
-                 <td>White Cement</td>
-                 <td>Wet cement</td>
-                 <td>Kg</td>
-                 <td>300</td>
-                 <td colspan='2'>110</td>
-                 <td>5</td>
-                 <td colspan='2'>2000</td>
-               
-               </tr>
-               <tr>
-                 <td>323</td>
-                 <td>White Cement</td>
-                 <td>Wet cement</td>
-                 <td>Kg</td>
-                 <td>300</td>
-                 <td colspan='2'>110</td>
-                 <td>5</td>
-                 <td colspan='2'>2000</td>
-               
-               </tr>
-               
-               </tbody>
-               <tfoot>
-               <tr>
-               <td colspan="6" class="text-right"><strong class="total">Total:</strong></td>
-               <td class="text-right">
-               <strong class="total"><span id="total">0</span></strong>
-               
-               </td>
-               <td  colspan='2'></td>
-               </tr>
-               <tr>
-               <td colspan="6" class="text-right"><strong class="total">Total Amount:</strong></td>
-               <td class="text-right">
-               <strong class="total"><span id="totalamount">0</span></strong>
-               
-               </td>
-               <td colspan='2'></td>
-               </tr>
-               <tr>
-               <td colspan="6" class="text-right"><strong class="total">Tax Total:</strong></td>
-               <td class="text-right">
-               <strong class="total"><span id="taxtotal">0</span></strong>
-               
-               </td>
-               <td colspan='2'></td>
-               </tr>
-               <tr>
-               <td colspan="6" class="text-right"><strong class="total">Discount:</strong></td>
-               <td class="text-right">
-               <strong class="total"><span id="discount">0</span></strong>
-               
-               </td>
-               <td colspan='2'></td>
-               </tr>
-               
-               <tr>
-               <td colspan="6" class="text-right"><strong class="total">Total:</strong></td>
-               
-               <td class="text-right"><strong class="total"><span id="total_add">0</span></strong>
-               </td>
-               <td colspan='2'></td>
-               </tr>
-               </tfoot> -->
-            <thead>
-               <tr>
-                  <th style='width:70px;text-align:center;font-size:12px;padding-top:10px'>S.NO	</th>
-                  <th colspan='2' style='width:350px;text-align:center;font-size:12px;padding-top:10px;' valign='baseline'> DESCRIPTION</th>
-                  <th style='width:100px;text-align:center;font-size:12px;padding-top:10px' valign='baseline'>QTY</th>
-                  <th style='width:90px;text-align:center;font-size:12px;padding-top:10px' valign='baseline'> UNIT</th>
-                  <th colspan='2' style='width:110px;text-align:center;font-size:12px;padding-top:10px' valign='baseline'>UNIT PRICE</th>
-                  <th colspan='2' style='width:100px;text-align:center;font-size:12px;padding-top:10px' valign='baseline'>TOTAL</th>
-               </tr>
-            </thead>
-            <tbody>
-               <tr style='height:40px;border:1px solid black'>
-                  <td  style='text-align:center;border-right:1px solid black'>1</td>
-                  <td colspan='2' style='padding-left:7px;border-right:1px solid black'><strong>Supply of EXTINGUISHERS 6KG DCP</strong></td>
-                  <td  style='text-align:center;border-right:1px solid black'>3.00</td>
-                  <td  style='text-align:center;border-right:1px solid black'>No</td>
-                  <td  style='text-align:center;border-right:1px solid black' colspan='2'>90.00</td>
-                  <td  style='text-align:center;border-right:1px solid black'  >270.00</td>
-               </tr>
-               <tr style='height:40px;border:1px solid black'>
-                  <td  style='text-align:center;border-right:1px solid black'>2</td>
-                  <td colspan='2' style='padding-left:7px;border-right:1px solid black'><strong>Supply of MANUAL PULL STATION - EUROTECH - UK ADDRESSABLE</strong></td>
-                  <td  style='text-align:center;border-right:1px solid black' >3.00</td>
-                  <td  style='text-align:center;border-right:1px solid black'>No</td>
-                  <td  style='text-align:center;border-right:1px solid black' colspan='2'>90.00</td>
-                  <td  style='text-align:center;border-right:1px solid black'  colspan='2'>270.00</td>
-               </tr>
-               <tr style='height:40px;border:1px solid black'>
-                  <td  style='text-align:center;border-right:1px solid black'>3</td>
-                  <td colspan='2' style='padding-left:7px;border-right:1px solid black'><strong>Supply of SOUNDER - EUROTECH - UK ADDRESSABLE (IP 65 Open Area)</strong></td>
-                  <td  style='text-align:center;border-right:1px solid black'>3.00</td>
-                  <td  style='text-align:center;border-right:1px solid black'>No</td>
-                  <td  style='text-align:center;border-right:1px solid black' colspan='2'>90.00</td>
-                  <td  style='text-align:center;border-right:1px solid black'  colspan='2'>270.00</td>
-               </tr>
-            </tbody>
-            <tfoot>
-               <!-- <tr style='height:40px;border:1px solid black'>
-                  <td  style='text-align:center;border-right:1px solid black'></td>
-                  <td colspan='2' style='padding-left:7px;border-right:1px solid black'><strong></strong></td>
-                  <td  style='text-align:center;border-right:1px solid black'></td>
-                  <td  style='text-align:center;border-right:1px solid black'></td>
-                  <td  style='text-align:center;border-right:1px solid black' colspan='2'></td>
-                  <td  style='text-align:center;border-right:1px solid black'  colspan='2'></td>
-                  </tr> -->
-               <tr style='height:40px'>
-                  <td colspan='7' align='right' style='padding-right:20px;border-right:1px solid black'>Total</td>
-                  <td colspan='2' align='center'>870.00</td>
-               </tr>
-            </tfoot>
-         </table>
-         <table>
-            <tr >
-               <td colspan='6' style='padding-top:30px;'>
-                  <p style='text-align:justify'><strong>Delivery Period:</strong><br>Ex-Stock Subject to prior sale </p>
-               </td>
-            </tr>
-            <tr>
-               <td>
-                  <p style='text-align:justify'><strong>Completion:</strong><br>Immediate</p>
-               </td>
-            </tr>
-            <tr>
-               <td>
-                  <p style='text-align:justify'><strong>Payment Terms:</strong><br>100% CDA/CASH Upon Delivery </p>
-               </td>
-            </tr>
-            <tr>
-               <td>
-                  <p style='text-align:justify'><strong>Validity:</strong><br> Our offer is valid for your acceptance for a period of 30 days from the date of our offer</p>
-               </td>
-            </tr>
-            <tr>
-               <td>
-                  <p style='text-align:justify'><strong>Exclusions:</strong><br>Delivery Transportation</p>
-               </td>
-            </tr>
-            <tr >
-               <td style='padding-top:30px'><strong>For<br>Dana World Cont. Co. WILL</strong></td>
-            </tr>
-            <tr style='height:30px'></tr>
-            <tr>
-               <td><strong>Mr.Mohammed Parvez<br>Sales & Estimation Manager<br>Mob: +974 31191694</strong></td>
-            </tr>
-            <tr style='height:30px'></tr> <tr style='height:30px'></tr> <tr style='height:30px'></tr>
-         </table>
-         <!--<h4>Adjustments</h4>
-            <table class="table summary-table">
-            <thead>
-            <tr>
-            <th>Consultant Name</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Differential Hours</th>
-            <th>Effective Bill Rate</th>
-            <th>Amount</th>
-            <th>Comments</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr class="simple">
-            <th scope="row">John A Doe</th>
-            <th>03 Jan 2017</th>
-            <th>03 Sep 2017</th>
-            <td>20.00</td>
-            <td>$106</td>
-            <td>$2100.00</td>
-            <td width="150px" class="text-left ft-12">Reason – I have incorrectly entered the time in March and I now madcorrections
-            </td>
-            </tr>
-            </tbody>
-            </table>
-            <div class="row">
-            <div class="col-md-12">
-              <div class="other-rates clearfix">
-            <dl class="dl-horizontal total clearfix">
-              <dt class="blue">Total</dt>
-              <dd>$1234424</dd>
-            </dl>
-            </div>
-            </div>
-            </div>
-            </div>-->
-         <!-- <div class="row">
-            <div class="col-md-12">
-              <div class="clearfix">
-            <dl class="dl-horizontal clearfix">
-              <dt class="blue">Comments or Special Instructions</dt>
-              <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rutrum a risus venenatis congue. Proin fringilla ligula id quam tincidunt imperdiet sit amet vitae mauris. Fusce sodales diam nec velit aliquet viverra. </dd>
-            </dl>
-            <dl class="dl-horizontal clearfix">
-              <dt class="blue">Trade Term</dt>
-              <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rutrum a risus venenatis congue. Proin fringilla ligula id quam tincidunt imperdiet sit amet vitae mauris. Fusce sodales diam nec velit aliquet viverra. </dd>
-            </dl>
-            <dl class="dl-horizontal clearfix">
-              <dt class="blue">Delivery Term</dt>
-              <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rutrum a risus venenatis congue. Proin fringilla ligula id quam tincidunt imperdiet sit amet vitae mauris. Fusce sodales diam nec velit aliquet viverra. </dd>
-            </dl>
-            <dl class="dl-horizontal clearfix">
-              <dt class="blue">Payment Term</dt>
-              <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rutrum a risus venenatis congue. Proin fringilla ligula id quam tincidunt imperdiet sit amet vitae mauris. Fusce sodales diam nec velit aliquet viverra. </dd>
-            </dl>
-            <dl class="dl-horizontal clearfix">
-              <dt class="blue">Material Warranty</dt>
-              <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec rutrum a risus venenatis congue. Proin fringilla ligula id quam tincidunt imperdiet sit amet vitae mauris. Fusce sodales diam nec velit aliquet viverra. </dd>
-            </dl>
-            </div>
-            </div>
-            </div> -->
-         <!-- Print section ends -->
-      </div>
+      <!-- /#print section -->
+       </div>
       <!-- /#wrapper -->
       <!-- jQuery -->
       <script src="plugins/bower_components/jquery/dist/jquery.min.js"></script>
@@ -544,10 +207,12 @@ if(empty($User_Id)){
 				url :"manage-quotation-data.php", 
 				type: "post",  
 				"data": function ( data ) {
-					data.filter_key = $("#filter_key").val();
-					data.filter_city = $("#filter_city").val();
-					data.filter_state = $("#filter_state").val();
-					data.total_project = $("#total_project").val();
+					data.QuotNumber = $("#QuotNumber").val();
+					data.QuotCreatedBy = $("#QuotCreatedBy").val();
+					data.QuotClient = $("#QuotClient").val();
+					data.QuotProjects = $("#QuotProjects").val();
+					data.QuotType = $("#QuotType").val();
+					data.QuotDate = $("#QuotDate").val();
 				},
 				complete: function() {
 					console.log('complete');
@@ -561,7 +226,10 @@ if(empty($User_Id)){
 			}
 		});
 	})
-
+	function filter_data()
+	{
+		$('#myTable').DataTable().ajax.reload();
+	}
 	</script>
       <!-- Bootstrap Core JavaScript -->
       <script src="bootstrap/dist/js/tether.min.js"></script>
@@ -600,7 +268,7 @@ if(empty($User_Id)){
          // For select 2
              $(".select2").select2();
            //date Picker
-             jQuery('.mydatepicker, #datepicker').datepicker('setDate', 'currentdate');
+             jQuery('.mydatepicker, #datepicker').datepicker();
          
          jQuery('#datepicker-autoclose').datepicker({
              autoclose: true,
@@ -612,17 +280,87 @@ if(empty($User_Id)){
          jQuery('#datepicker-inline').datepicker({
              todayHighlight: true
          });
-         
+         /*DELETE Start*/	
+	$(document).on('click', '.deleteone', function() {
+		var element = $(this);
+		var id = element.attr("data-id");
+		var status = 2;
+		var ms = 'Delete'
+		swal({
+			title: ms,
+			text: "Are you sure?",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "Yes, Delete it!",
+			cancelButtonText: "Cancel",
+			closeOnConfirm: false,
+			closeOnCancel: false
+		}, function(isConfirm){
+			if (isConfirm) {
+				$.ajax({
+					type: "POST",
+					url: "ajax-status.php",
+					cache:false,
+					data: 'id='+id+'&status='+status+'&meth=quotation-del',
+					dataType:'json',
+					success: function(response)
+					{
+						swal(response.status, response.msg,response.err);
+						if(response.result){
+							$('#myTable').DataTable().ajax.reload();
+						}
+						setTimeout(function() {
+							$(".confirm").trigger('click');
+						}, 3000);
+					}
+				});
+			}
+			else
+			{
+				swal("Cancelled", "", "error");
+			}
+		});
+	});/*DELETE END*/
          
       </script>
-      <script>
-         function printDiv(divName){
-         	var printContents = document.getElementById(divName).innerHTML;
-         	var originalContents = document.body.innerHTML;
-         	document.body.innerHTML = printContents;
-         	window.print();
-         	document.body.innerHTML = originalContents;
-         }
-      </script>
+<script>
+function printDiv(divName,id){
+	status = call_html(id);
+	if(status){ 
+		setTimeout(function() {
+			var printContents = document.getElementById(divName).innerHTML;
+			var originalContents = document.body.innerHTML;
+			document.body.innerHTML = printContents;
+			window.print();
+			document.body.innerHTML = originalContents;
+		}, 3000);
+		
+	}
+	else
+	{
+		swal('Error', 'Not able to print this Quotation','error');
+	}	
+}
+function call_html(id)
+{
+	ret = 0;
+	$.ajax({
+			type: "POST",
+			url: "ajax-status.php",
+			cache:false,
+			data: 'id='+id+'&meth=ajax_print',
+			dataType:'json',
+			success: function(response)
+			{
+				if(response.result){
+					$('#printMe').html(response.msg);
+					ret = 1;
+				}
+			}			
+	});
+	return ret;
+}
+</script>
    </body>
 </html>

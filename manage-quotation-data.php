@@ -5,40 +5,34 @@ require_once('inc/pdoFunctions.php');
 $table_name = 'quotations';
 // storing  request (ie, get/post) global array to a variable
 $requestData= $_REQUEST;
-$where = '';
-if($requestData[filter_key] != '')
+$where1 = '';$where2 = '';$where3 = '';$where4 = '';$where5 = '';$where6 = '';
+if($requestData[QuotNumber] != '')
 {
-	$filter_key = $requestData[filter_key];
-	if($requestData[filter_city] != '' or $requestData[filter_state] != '')
-	$where .= '( c_name like "%'.$filter_key.'%" or p_contact_person like "%'.$filter_key.'%" or c_phone like "%'.$filter_key.'%" or p_phone like "%'.$filter_key.'%" or p_mobile like "%'.$filter_key.'%" ) or ';
-	else
-	$where .= '( c_name like "%'.$filter_key.'%" or p_contact_person like "%'.$filter_key.'%" or c_phone like "%'.$filter_key.'%" or p_phone like "%'.$filter_key.'%" or p_mobile like "%'.$filter_key.'%" ) and ';
+	$where1 = 'AND estNumber='.$requestData[QuotNumber];
 }	
-
-if($requestData[filter_city] != '')
+if($requestData[QuotCreatedBy] != '')
 {
-	$filter_city = $requestData[filter_city];
-	if($requestData[filter_state] != '')
-	$where .= "c_city = '".$filter_city."' or ";
-	else
-	$where .= "c_city = '".$filter_city."' and ";
+	$where2 = 'AND estCreatedBy='.$requestData[QuotCreatedBy];
 }
-if($requestData[filter_state] != '')
+if($requestData[QuotClient] != '')
 {	
-	$filter_state = $requestData[filter_state];
-	$where .= "c_state = '".$filter_state."' and ";
+	$where3 = 'AND clientName='.$requestData[QuotClient];
 }	
-if($requestData[total_project] != '')
+if($requestData[QuotProjects] != '')
 {	
-	$total_project = $requestData[total_project];
-	$where .= '';
+	$where4 = 'AND projectName='.$requestData[QuotProjects];
+}
+if($requestData[QuotType] != '')
+{	
+	$where5 = 'AND estType='.$requestData[QuotType];
+}
+if($requestData[QuotDate] != '')
+{	
+	$from_date = date("Y-m-d",strtotime($requestData[QuotNumber]));
+	$where6 = 'AND estCreatedDate='.$from_date;
 }	
 
-
-if($filter_key == '' and $filter_city == '' and $filter_state == '' and $total_project == '')
-$sql = 'select * from '.$table_name.' where status != 2';
-else
-$sql = 'select * from '.$table_name.' where '.$where.' status != 2';
+$sql = 'select * from '.$table_name.' where quotStatus != 2 '.$where1.' '.$where2.' '.$where3.' '.$where4.' '.$where5.' '.$where6;
 
 $data = array();
 $row=$prop->getAll_Disp($sql);
@@ -46,9 +40,13 @@ for($i=0; $i<count($row); $i++)
 	 {  // preparing an array
 	$nestedData=array();
 	$nestedData[] = $row[$i]["estNumber"];
-	$nestedData[] = $row[$i]["clientName"];
+	$clientName = $prop->get_Disp('select * from '.CLIENTS.' WHERE status != 2 AND id='.$row[$i]["clientName"] );
+    $c_name = $clientName['c_name'];
+	$nestedData[] = $c_name;
 	$nestedData[] = $row[$i]["projectName"];
-	$nestedData[] = $row[$i]["estCreatedBy"];
+	$user = $prop->get_Disp('select * from '.USERS.' WHERE is_delete = 0 AND id='.$row[$i]["estCreatedBy"] );
+    $f_name = $user['f_name'];
+	$nestedData[] = $f_name ;
 	$nestedData[] = $row[$i]["estType"];
 	//$curr_date = date("m/d/Y", strtotime($row[$i]["estCreatedBy"]));
 	$nestedData[] = date("m/d/Y", strtotime($row[$i]["estCreatedDate"]));
@@ -58,7 +56,7 @@ for($i=0; $i<count($row); $i++)
 	$printMe = "'printMe'";
 	$eq.='<a href="add-quotation.php?id='.$row[$i]['id'].'" data-toggle="tooltip" data-original-title="Edit"> <span class="label-edit"><i class="ti-pencil"></i></span> </a>';
 	
-	$eq.='<a onClick="printDiv('.$printMe.')" data-toggle="tooltip" data-original-title="Print"> <span class="label-print"><i class="ti-printer"></i></span> </a>';
+	$eq.='<a onClick="printDiv('.$printMe.','.$row[$i]['id'].')" data-toggle="tooltip" data-original-title="Print"> <span class="label-print"><i class="ti-printer"></i></span> </a>';
 	
 	$eq.='<a href="#" data-toggle="tooltip" data-original-title="Convert As Job"> <span class="label-job" alt="alert"><i class="ti-briefcase"></i></span> </a>';
 	
