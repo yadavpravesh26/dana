@@ -27,6 +27,24 @@ if($meth=='client-del')
 	echo json_encode($output); exit;
 }
 
+if($meth=='quot-row-del')
+{
+	$table_name = "quot_trading";
+	$id = $_POST["id"];
+	$t_cond = array("id" => $id);
+	$values = array("quotation_id" => 0);
+	$s = $prop->update($table_name, $values, $t_cond);
+	
+	if($s){
+		$output = array('status'=>'Status','msg'=>'Deleted Successfully','err'=>'success','result'=>1);
+	}
+	else
+	{
+		$output = array('status'=>'Error','msg'=>'Deleted Failed','err'=>'error');
+	}	
+	echo json_encode($output); exit;
+}
+
 
 
 ?>
